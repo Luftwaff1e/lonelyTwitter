@@ -6,6 +6,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.ViewAsserts;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import ca.ualberta.cs.lonelytwitter.LonelyTwitterActivity;
@@ -34,6 +35,37 @@ public class LonelyTwitterActivityUITest extends
 		textInput = ((EditText) activity.findViewById(ca.ualberta.cs.lonelytwitter.R.id.body));
 	}
 	
+	public void testSetText() {
+		String text = "neat!";
+		instrumentation.runOnMainSync(new Runnable() {
+			
+			@Override
+			public void run() {
+				textInput.setText("neat!");
+			}
+		});
+		
+		instrumentation.waitForIdleSync();
+		
+		assertEquals("Does this work?", text, textInput.getText().toString());
+	}
+	
+	public void testMakeTweet() {
+		ListView lView = (ListView) activity.findViewById(ca.ualberta.cs.lonelytwitter.R.id.oldTweetsList);
+		ListAdapter adapter = lView.getAdapter();
+		int size = adapter.getCount();
+		instrumentation.runOnMainSync(new Runnable() {
+			
+			@Override
+			public void run() {
+				makeTweet("Hello");
+			}
+		});
+		instrumentation.waitForIdleSync();
+		int afterSize = adapter.getCount();
+		assertEquals("Adapter working?", size+1, afterSize);
+	}
+	
 	/*
 	 * fills in the input text field and clicks the 'save'
 	 * button for the activity under test
@@ -42,5 +74,6 @@ public class LonelyTwitterActivityUITest extends
 		assertNotNull(activity.findViewById(ca.ualberta.cs.lonelytwitter.R.id.save));
 		textInput.setText(text);
 		((Button) activity.findViewById(ca.ualberta.cs.lonelytwitter.R.id.save)).performClick();
+		
 	}
 }
